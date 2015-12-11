@@ -1,0 +1,35 @@
+{
+  "name": "Sprinklr",
+  "version": "0.1.0",
+  "description": "Hydrate deep relations from a flat tree",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "build": "NODE_ENV=production ./node_modules/.bin/webpack --config webpack.js",
+    "test": "karma start --single-run",
+    "tests": "karma start"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "immutable": "^3.7.5",
+    "reselect": "^2.0.1"
+  },
+  "devDependencies": {
+    "babel-core": "^5.6.15",
+    "babel-es6-polyfill": "^1.0.1",
+    "babel-loader": "^5.3.1",
+    "jasmine-core": "^2.3.4",
+    "karma": "^0.13.15",
+    "karma-jasmine": "^0.3.6",
+    "karma-jasmine-ajax": "^0.1.13",
+    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-webpack": "^1.7.0",
+    "phantomjs": ">=1.9",
+    "phantomjs-polyfill": "0.0.1",
+    "uglify-js": "^2.4.23",
+    "webpack": "^1.10.1"
+  }
+}
