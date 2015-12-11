@@ -87,7 +87,7 @@ function hydrateHelper(model, relation, relatedData) {
 function hydrateModel(singleRelations, multiRelations, reverseRelations) {
     return createSelector(
         (source, singleRelationModels, multiRelationModels, reverseRelationModels) =>
-            source.withMutations(source =>
+            source ? source.withMutations(source =>
                 reverseRelations.reduce(
                     (model, relation, i) => hydrateHelper(model, relation, reverseRelationModels[i]),
                     multiRelations.reduce(
@@ -98,7 +98,7 @@ function hydrateModel(singleRelations, multiRelations, reverseRelations) {
                         )
                     )
                 )
-            ),
+            ) : Immutable.Map(),
         model => model
     );
 }

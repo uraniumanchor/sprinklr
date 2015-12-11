@@ -515,5 +515,10 @@ describe('models selectors', () => {
                 expect(modelSelector.recomputations()).toBe(1);
             });
         });
+
+        it('returns an empty object if the model is not in the state', () => {
+            modelSelector = createModelSelectorCreator('a')(123);
+            expect(modelSelector(state).toJS()).toEqual({});
+        });
     });
 });
