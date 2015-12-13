@@ -31,26 +31,26 @@ function retrieveModel(state, sourceModel, id) {
     return state.getIn([sourceModel, id]);
 }
 
-function createModelSelector(sourceModel, id, whiteList, blackList) {
+function createModelSelector(sourceModel, id, whitelist, blacklist) {
     let modelSelector = createSelector(
-        [state => state],
-        state => retrieveModel(state, sourceModel, id)
+        [state => retrieveModel(state, sourceModel, id)],
+        model => model && model.set('pk', id)
     );
 
-    if (whiteList) {
+    if (whitelist) {
         modelSelector = createIdentitySelector(
             createSelector(
                 modelSelector,
-                model => model.filter((v, k) => whiteList.indexOf(k) !== -1)
+                model => model && model.filter((v, k) => whitelist.indexOf(k) !== -1)
             )
         );
     }
 
-    if (blackList) {
+    if (blacklist) {
         modelSelector = createIdentitySelector(
             createSelector(
                 modelSelector,
-                model => model.filter((v, k) => blackList.indexOf(k) === -1)
+                model => model && model.filter((v, k) => blacklist.indexOf(k) === -1)
             )
         );
     }
@@ -65,7 +65,7 @@ export function createRelationRetriever(relation, id) {
 
     return relation.selectorCreator ?
         relation.selectorCreator(id) :
-        createModelSelector(relation.model, id, relation.whiteList, relation.blackList);
+        createModelSelector(relation.model, id, relation.whitelist, relation.blacklist);
 }
 
 function createSingleSelector(sourceModel, id, relations) {
@@ -126,12 +126,15 @@ export function createMultiRetrievalSelectorCreator(sourceModel, relation) {
         }
         const multiRetrieversSelector = createEquivalenceSelector(
             [
-                state => state.getIn([sourceModel, id, relation.field_id])
+                state => state.getIn([sourceModel, id, relation.field_id]) || Immutable.List()
             ],
             related_ids => related_ids.map(related_id => createRelationRetriever(relation, related_id))
         );
 
-        return createIdentitySelector(state => multiRetrieversSelector(state).map(retriever => retriever(state)));
+        return createEquivalenceSelector(
+            state => multiRetrieversSelector(state).map(retriever => retriever(state)),
+            models => models.toSet()
+        );
     };
 }
 
@@ -151,29 +154,42 @@ export function createReverseRetrievalSelectorCreator(relation) {
             related_ids => related_ids.map(related_id => createRelationRetriever(relation, related_id))
         );
 
-        return createIdentitySelector(state => reverseRetrieversSelector(state).map(retriever => retriever(state)));
+        return createEquivalenceSelector(
+            state => reverseRetrieversSelector(state).map(retriever => retriever(state)),
+            models => models.toSet()
+        );
     }
 }
 
-export function createModelSelectorCreator(sourceModel, singleRelations = [], multiRelations = [], reverseRelations = [], whiteList = null, blackList = null) {
+export function createModelSelectorCreator(sourceModel,
+        {
+            singleRelations = [],
+            multiRelations = [],
+            reverseRelations = [],
+            whitelist = null,
+            blacklist = null
+        } = {}) {
+    const finalHydrate = hydrateModel(singleRelations, multiRelations, reverseRelations);
     return id => {
         if (!id) {
             throw new Error('id is falsy');
         }
         return createSelector(
             [
-                createModelSelector(sourceModel, id, whiteList, blackList),
+                createModelSelector(sourceModel, id, whitelist, blacklist),
                 createSingleSelector(sourceModel, id, singleRelations),
                 createMultiSelector(sourceModel, id, multiRelations),
                 createReverseSelector(id, reverseRelations),
             ],
-            hydrateModel(singleRelations, multiRelations, reverseRelations)
+            finalHydrate
         );
     }
 }
 
 export default {
+    createRelationRetriever,
     createSingleRetrievalSelectorCreator,
     createMultiRetrievalSelectorCreator,
+    createReverseRetrievalSelectorCreator,
     createModelSelectorCreator,
 };

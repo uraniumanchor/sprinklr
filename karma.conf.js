@@ -1,5 +1,7 @@
 module.exports = function(config) {
     config.set({
+        autoWatch: true,
+
         browsers: ['PhantomJS'],
 
         frameworks: ['jasmine'],
