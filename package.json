@@ -1,7 +1,8 @@
 {
   "name": "sprinklr",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "homepage": "https://github.com/uraniumanchor/sprinklr",
+  "repository": "uraniumanchor/sprinklr",
   "description": "Hydrate deep relations from a flat tree",
   "main": "index.js",
   "files": [
@@ -12,7 +13,7 @@
     "test": "karma start --single-run",
     "tests": "karma start"
   },
-  "author": "",
+  "author": "Benjamin Cutler",
   "license": "MIT",
   "dependencies": {
     "immutable": "^3.7.5",
